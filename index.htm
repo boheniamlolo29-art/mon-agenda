@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>AGENDA - Mon planning</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f3f5f9;
+    color: #182235;
+    min-height: 100vh;
+}
+
+.app {
+    max-width: 600px;
+    margin: auto;
+    min-height: 100vh;
+    background: #fff;
+    padding-bottom: 35px;
+}
+
+/* HEADER */
+
+.header {
+    background: #101827;
+    color: white;
+    padding: 28px 22px 35px;
+    border-radius: 0 0 27px 27px;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.logo span {
+    color: #80aaff;
+}
+
+.today {
+    font-size: 12px;
+    color: #aebbd0;
+    margin-bottom: 8px;
+}
+
+.header h1 {
+    font-size: 29px;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #aebbd0;
+    font-size: 14px;
+}
+
+.stats {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.stat {
+    background: #202d42;
+    padding: 14px;
+    border-radius: 13px;
+    flex: 1;
+}
+
+.stat strong {
+    display: block;
+    font-size: 23px;
+    margin-bottom: 4px;
+}
+
+.stat small {
+    color: #aebbd0;
+    font-size: 11px;
+}
+
+/* CALENDRIER */
+
+.section {
+    padding: 25px 20px 0;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-title h2 {
+    font-size: 19px;
+}
+
+.month-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.month-nav button {
+    border: none;
+    background: #f0f3f8;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.month-nav span {
+    font-weight: 700;
+    font-size: 14px;
+    min-width: 105px;
+    text-align: center;
+}
+
+.weekdays, .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    gap: 7px;
+}
+
+.weekdays {
+    margin-bottom: 12px;
+    color: #9aa4b4;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.day {
+    min-height: 43px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    position: relative;
+    cursor: pointer;
+    color: #253147;
+}
+
+.day.empty {
+    cursor: default;
+}
+
+.day.selected {
+    background: #17243a;
+    color: white;
+}
+
+.day.today:not(.selected) {
+    border: 1px solid #688fda;
+    color: #376ac0;
+    font-weight: 800;
+}
+
+.day .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #6493e9;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.day.selected .dot {
+    background: #fff;
+}
+
+/* EVENEMENTS */
+
+.events {
+    padding: 27px 20px;
+}
+
+.events-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.events-header h2 {
+    font-size: 19px;
+}
+
+.add-btn {
+    background: #17243a;
+    color: white;
+    border: none;
+    border-radius: 11px;
+    padding: 11px 15px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.event-card {
+    display: flex;
+    align-items: stretch;
+    background: #f7f8fb;
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 12px;
+    gap: 13px;
+}
+
+.event-color {
+    width: 4px;
+    border-radius: 5px;
+    background: #6c91e6;
+}
+
+.event-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-info h3 {
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.event-info p {
+    font-size: 12px;
+    color: #8993a4;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+}
+
+.event-time {
+    font-size: 12px;
+    font-weight: 700;
+    color: #526b94;
+    white-space: nowrap;
+}
+
+.event-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 9px;
+}
+
+.event-actions button {
+    border: none;
+    background: #e8edf5;
+    padding: 6px 9px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 35px 15px;
+    color: #98a2b2;
+    background: #f7f8fb;
+    border-radius: 14px;
+    font-size: 13px;
+}
+
+/* FORMULAIRE */
+
+.form-section {
+    margin: 0 20px;
+    padding: 20px;
+    background: #f4f6fa;
+    border-radius: 17px;
+    display: none;
+}
+
+.form-section.visible {
+    display: block;
+}
+
+.form-section h2 {
+    font-size: 18px;
+    margin-bottom: 18px;
+}
+
+.field {
+    margin-bottom: 13px;
+}
+
+.field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.field input, .field textarea, .field select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #dce2eb;
+    background: white;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+.field textarea {
+    resize: vertical;
+    min-height: 65px;
+}
+
+.field input:focus, .field textarea:focus {
+    border-color: #7296dd;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.form-buttons button {
+    flex: 1;
+    padding: 13px;
+    border: none;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.save {
+    background: #17243a;
+    color: white;
+}
+
+.cancel {
+    background: #e2e7ef;
+    color: #26354d;
+}
+
+/* NAVIGATION BASSE */
+
+.footer {
+    text-align: center;
+    color: #a1aaba;
+    font-size: 11px;
+    padding: 15px;
+}
+
+@media (max-width: 380px) {
+    .header h1 {
+        font-size: 25px;
+    }
+
+    .section, .events {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .day {
+        min-height: 39px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header class="header">
+        <div class="top">
+            <div class="logo">AGENDA<span>.</span></div>
+            <div id="headerDate" class="today"></div>
+        </div>
+
+        <h1>Mon planning</h1>
+        <p>Organise tes journées simplement.</p>
+
+        <div class="stats">
+            <div class="stat">
+                <strong id="totalEvents">0</strong>
+                <small>Événements au total</small>
+            </div>
+            <div class="stat">
+                <strong id="todayEvents">0</strong>
+                <small>Événements aujourd'hui</small>
+            </div>
+        </div>
+    </header>
+
+    <section class="section">
+
+        <div class="section-title">
+            <h2>Calendrier</h2>
+
+            <div class="month-nav">
+                <button onclick="changeMonth(-1)">‹</button>
+                <span id="monthName"></span>
+                <button onclick="changeMonth(1)">›</button>
+            </div>
+        </div>
+
+        <div class="weekdays">
+            <span>LUN</span>
+            <span>MAR</span>
+            <span>MER</span>
+            <span>JEU</span>
+            <span>VEN</span>
+            <span>SAM</span>
+            <span>DIM</span>
+        </div>
+
+        <div class="calendar" id="calendar"></div>
+
+    </section>
+
+    <section class="events">
+
+        <div class="events-header">
+            <h2 id="selectedDateTitle">Mes événements</h2>
+            <button class="add-btn" onclick="openForm()">+ Ajouter</button>
+        </div>
+
+        <div id="eventList"></div>
+
+    </section>
+
+    <section class="form-section" id="formSection">
+
+        <h2 id="formTitle">Nouvel événement</h2>
+
+        <form id="eventForm">
+
+            <div class="field">
+                <label for="eventName">Nom de l'événement</label>
+                <input id="eventName" type="text"
+                    placeholder="Ex : Rendez-vous, sport..." required>
+            </div>
+
+            <div class="field">
+                <label for="eventDate">Date</label>
+                <input id="eventDate" type="date" required>
+            </div>
+
+            <div class="field">
+                <label for="eventTime">Heure</label>
+                <input id="eventTime" type="time" value="09:00">
+            </div>
+
+            <div class="field">
+                <label for="eventCategory">Catégorie</label>
+                <select id="eventCategory">
+                    <option>Personnel</option>
+                    <option>Travail</option>
+                    <option>Études</option>
+                    <option>Sport</option>
+                    <option>Autre</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="eventDescription">Description</label>
+                <textarea id="eventDescription"
+                    placeholder="Ajouter des détails..."></textarea>
+            </div>
+
+            <div class="form-buttons">
+                <button class="save" type="submit">Enregistrer</button>
+                <button class="cancel" type="button"
+                    onclick="closeForm()">Annuler</button>
+            </div>
+
+        </form>
+
+    </section>
+
+    <div class="footer">
+        AGENDA. — Ton organisation, simplement.
+    </div>
+
+</div>
+
+<script>
+
+// DONNEES
+
+let events = [];
+
+try {
+    events = JSON.parse(localStorage.getItem("myAgendaEvents")) || [];
+    if (!Array.isArray(events)) events = [];
+} catch (error) {
+    events = [];
+}
+
+const today = new Date();
+
+let currentMonth = today.getMonth();
+let currentYear = today.getFullYear();
+
+let selectedDate = formatDate(today);
+let editingId = null;
+
+// OUTILS
+
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+function saveEvents() {
+    localStorage.setItem("myAgendaEvents", JSON.stringify(events));
+    updateStats();
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+// CALENDRIER
+
+function renderCalendar() {
+
+    const calendar = document.getElementById("calendar");
+    calendar.innerHTML = "";
+
+    const monthNames = [
+        "Janvier", "Février", "Mars", "Avril",
+        "Mai", "Juin", "Juillet", "Août",
+        "Septembre", "Octobre", "Novembre", "Décembre"
+    ];
+
+    document.getElementById("monthName").textContent =
+        monthNames[currentMonth] + " " + currentYear;
+
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const daysInMonth =
+        new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    let offset = (firstDay.getDay() + 6) % 7;
+
+    for (let i = 0; i < offset; i++) {
+        const empty = document.createElement("div");
+        empty.className = "day empty";
+        calendar.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+
+        const date = new Date(currentYear, currentMonth, day);
+        const dateString = formatDate(date);
+
+        const button = document.createElement("button");
+        button.className = "day";
+        button.textContent = day;
+
+        if (dateString === selectedDate) {
+            button.classList.add("selected");
+        }
+
+        if (dateString === formatDate(today)) {
+            button.classList.add("today");
+        }
+
+        if (events.some(event => event.date === dateString)) {
+            const dot = document.createElement("span");
+            dot.className = "dot";
+            button.appendChild(dot);
+        }
+
+        button.onclick = () => {
+            selectedDate = dateString;
+            renderCalendar();
+            renderEvents();
+        };
+
+        calendar.appendChild(button);
+    }
+}
+
+function changeMonth(direction) {
+
+    currentMonth += direction;
+
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+
+    renderCalendar();
+}
+
+// EVENEMENTS
+
+function renderEvents() {
+
+    const list = document.getElementById("eventList");
+
+    const date = new Date(selectedDate + "T12:00:00");
+
+    document.getElementById("selectedDateTitle")
+        .textContent = date.toLocaleDateString("fr-FR", {
+            weekday: "long",
+            day: "numeric",
+            month: "long"
+        });
+
+    const dayEvents = events
+        .filter(event => event.date === selectedDate)
+        .sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+
+    list.innerHTML = "";
+
+    if (dayEvents.length === 0) {
+        list.innerHTML = `
+            <div class="empty-message">
+                Aucun événement prévu pour cette journée.
+                <br><br>
+                Appuie sur + Ajouter pour commencer.
+            </div>
+        `;
+    }
+
+    dayEvents.forEach(event => {
+
+        const card = document.createElement("div");
+        card.className = "event-card";
+
+        card.innerHTML = `
+            <div class="event-color"></div>
+
+            <div class="event-info">
+                <h3>${escapeHTML(event.name)}</h3>
+                <p>${escapeHTML(event.category || "Personnel")}</p>
+                ${event.description ?
+                    `<p>${escapeHTML(event.description)}</p>` : ""}
+
+                <div class="event-actions">
+                    <button onclick="editEvent('${event.id}')">
+                        Modifier
+                    </button>
+
+                    <button onclick="deleteEvent('${event.id}')">
+                        Supprimer
+                    </button>
+                </div>
+            </div>
+
+            <div class="event-time">
+                ${escapeHTML(event.time || "--:--")}
+            </div>
+        `;
+
+        list.appendChild(card);
+    });
+
+    updateStats();
+}
+
+// STATISTIQUES
+
+function updateStats() {
+
+    document.getElementById("totalEvents").textContent =
+        events.length;
+
+    document.getElementById("todayEvents").textContent =
+        events.filter(event => event.date === formatDate(today)).length;
+}
+
+// FORMULAIRE
+
+function openForm() {
+
+    editingId = null;
+
+    document.getElementById("eventForm").reset();
+
+    document.getElementById("eventDate").value = selectedDate;
+    document.getElementById("eventTime").value = "09:00";
+
+    document.getElementById("formTitle").textContent =
+        "Nouvel événement";
+
+    document.getElementById("formSection")
+        .classList.add("visible");
+
+    document.getElementById("eventName").focus();
+}
+
+function closeForm() {
+    document.getElementById("formSection")
+        .classList.remove("visible");
+}
+
+document.getElementById("eventForm").addEventListener(
+    "submit", function(e) {
+
+        e.preventDefault();
+
+        const name =
+            document.getElementById("eventName").value.trim();
+
+        if (!name) return;
+
+        const eventData = {
+            id: editingId || String(Date.now()),
+            name: name,
+            date: document.getElementById("eventDate").value,
+            time: document.getElementById("eventTime").value,
+            category: document.getElementById("eventCategory").value,
+            description:
+                document.getElementById("eventDescription").value.trim()
+        };
+
+        if (!eventData.date) return;
+
+        if (editingId) {
+
+            events = events.map(event =>
+                event.id === editingId ? eventData : event
+            );
+
+        } else {
+
+            events.push(eventData);
+
+        }
+
+        selectedDate = eventData.date;
+
+        const selected = new Date(selectedDate + "T12:00:00");
+        currentMonth = selected.getMonth();
+        currentYear = selected.getFullYear();
+
+        saveEvents();
+        closeForm();
+        renderCalendar();
+        renderEvents();
+    }
+);
+
+// MODIFICATION
+
+function editEvent(id) {
+
+    const event = events.find(event => event.id === id);
+
+    if (!event) return;
+
+    editingId = id;
+
+    document.getElementById("eventName").value = event.name;
+    document.getElementById("eventDate").value = event.date;
+    document.getElementById("eventTime").value = event.time || "";
+    document.getElementById("eventCategory").value =
+        event.category || "Personnel";
+    document.getElementById("eventDescription").value =
+        event.description || "";
+
+    document.getElementById("formTitle").textContent =
+        "Modifier l'événement";
+
+    document.getElementById("formSection")
+        .classList.add("visible");
+
+    document.getElementById("formSection")
+        .scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+// SUPPRESSION
+
+function deleteEvent(id) {
+
+    if (!confirm("Supprimer cet événement ?")) return;
+
+    events = events.filter(event => event.id !== id);
+
+    saveEvents();
+    renderCalendar();
+    renderEvents();
+}
+
+// INITIALISATION
+
+document.getElementById("headerDate").textContent =
+    today.toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+    });
+
+renderCalendar();
+renderEvents();
+updateStats();
+
+</script>
+
+</body>
+</html>
